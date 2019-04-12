@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import math
 from bs4 import BeautifulSoup
 import re
 from urllib import request as wohaoshuai

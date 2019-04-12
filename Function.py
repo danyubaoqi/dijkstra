@@ -1,5 +1,48 @@
 from math import *
+from sqlite3 import *
+import re
+#计算价格
+def get_allLocation():
+    allLocation=[]
+    dbCon = connect("db/location.db")
+    myCursor = dbCon.execute('SELECT location FROM Location')
+    for i in myCursor:
+        allLocation.append(str(i))
+    myCursor.close()
+    dbCon.close()
+    return allLocation
 
+def get_change():
+    change={}
+    dbCon = connect("db/change.db")
+    myCursor = dbCon.execute("SELECT location,nummber FROM change")
+    for i in myCursor:
+        change[i[0]] = i[1]
+    myCursor.close()
+    dbCon.close()
+    return change
+
+def get_line():
+    dbCon = connect("db/lineData.db")
+    myCursor = dbCon.execute("SELECT line,ldata FROM LD")
+    line = {}
+    for i in myCursor:
+        ldata = re.findall(r"\'.*?\'", i[1])
+        line[i[0]] = []
+        for j in ldata:
+            line[i[0]].append(str(j).replace("'", ""))
+    myCursor.close()
+    dbCon.close()
+    return line
+
+def get_distance(change):
+
+    dbCon = connect("db/路径距离数据.db")
+    myCursor = dbCon.execute("""SELECT location1,location2,distance FROM LLD""")
+    dict_distance = {}
+    for i in myCursor:
+        dict_distance[str(change[i[0]]) + "-" + str(change[i[1]])] = i[2]
+    return dict_distance
 
 def calPrice(a):
     if a <= 6000:
@@ -14,7 +57,7 @@ def calPrice(a):
         return 6 + ceil((a - 32000) / 20000)
 
 
-
+#基于迪杰斯特拉计算两站点的最短路径以及换乘
 def dijkstra(start, end, allLocation, lujing, change, dict_distance):
     pre_node = []
     visit = []
@@ -42,6 +85,7 @@ def dijkstra(start, end, allLocation, lujing, change, dict_distance):
                 best = distance[i]
                 u = i
         visit[u] = True
+        #如果发现找到终点，结束
         if u == end: break
         Key = dict_distance.keys()
         for v in range(n):
@@ -55,7 +99,8 @@ def dijkstra(start, end, allLocation, lujing, change, dict_distance):
         print(str(calPrice(distance[end])) + "元")
         printf(end)
 
-
+#判断abc三个站是否是一个路线的，北京地铁不存在不同线路有相邻的两个站
+#
 def isSameStation(a, b, c, line, content):
     one = []
     two = []
@@ -78,7 +123,7 @@ def isSameStation(a, b, c, line, content):
                     content.append("在" + b + "换乘" + j + "通往" + c)
                     print("在" + b + "换乘" + j + "通往" + c)
 
-
+#直接返回html
 def make_html(lujing, content, line):
     lenl = len(lujing)
     i = 0
