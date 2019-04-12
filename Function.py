@@ -14,6 +14,7 @@ def calPrice(a):
         return 6 + ceil((a - 32000) / 20000)
 
 
+
 def dijkstra(start, end, allLocation, lujing, change, dict_distance):
     pre_node = []
     visit = []
