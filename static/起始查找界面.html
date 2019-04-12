@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+    <script type="text/javascript" src="../static/jquery-3.1.1.min.js"></script>
+        <style type="text/css">
+                body{background-color: white}
+                b{font-size: 20px}
+                #start{width: 120px;height: 20px;}
+                #end{width: 120px;height: 20px}
+                #space{width: 180px }
+                #mapLink{margin: auto}
+
+            </style>
+    </head>
+    <body style="background-image:url(../static/哆啦A梦.jpg);background-repeat: no-repeat;margin-left: 550px;margin-top: 200px">
+
+            <form action="http://localhost:5000/check/" method="post">
+                <table >
+                    <td>起点  :<input type="text" id="start" name="START"></td>
+                    <td id="space"> </td>
+                    <td>目的地:<input type="text" id="end" name="END"></td>
+                    <td><input type="submit"></td>
+                </table>
+            </form>
+        <a href="http://map.baidu.com/?subwayShareId=beijing,131" id="mapLink">北京地铁线路图详情</a>
+    </body>
+</html>
