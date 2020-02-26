@@ -11,7 +11,7 @@ change = get_change()
 # 线路信息
 line = get_line()
 # 两站间距离信息
-dict_distance = get_distance(change)
+dict_distance = get_distance()
 ####
 # 前端
 ####
@@ -40,7 +40,6 @@ def check():
 
 @app.route("/lineData/")
 def getLineData():
-    print(line)
     return render_template("查询界面.html", line=line)
 
 

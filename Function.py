@@ -1,47 +1,49 @@
 from math import *
-from sqlite3 import *
-import re
-#计算价格
+import pymysql
+pycon=pymysql.connect("localhost","root","123456","subway",3306)
+
 def get_allLocation():
-    allLocation=[]
-    dbCon = connect("db/location.db")
-    myCursor = dbCon.execute('SELECT location FROM Location')
-    for i in myCursor:
-        allLocation.append(str(i))
-    myCursor.close()
-    dbCon.close()
-    return allLocation
+    cur=pycon.cursor()
+    sql="select station_name from station_information"
+    cur.execute(sql)
+    return cur.fetchall()
+
 
 def get_change():
     change={}
-    dbCon = connect("db/change.db")
-    myCursor = dbCon.execute("SELECT location,nummber FROM change")
-    for i in myCursor:
-        change[i[0]] = i[1]
-    myCursor.close()
-    dbCon.close()
+    cur = pycon.cursor()
+    sql = "select station_name,station_id from station_information"
+    cur.execute(sql)
+    data=cur.fetchall()
+    for i in data:
+        change[i[0]]=i[1]
     return change
 
 def get_line():
-    dbCon = connect("db/lineData.db")
-    myCursor = dbCon.execute("SELECT line,ldata FROM LD")
-    line = {}
-    for i in myCursor:
-        ldata = re.findall(r"\'.*?\'", i[1])
-        line[i[0]] = []
-        for j in ldata:
-            line[i[0]].append(str(j).replace("'", ""))
-    myCursor.close()
-    dbCon.close()
-    return line
 
-def get_distance(change):
+    d={}
+    cur=pycon.cursor()
+    sql="select * from line_station"
+    cur.execute(sql)
+    for i in cur.fetchall():
+        if i[0] in d:
+            d[i[0]].append(i[1])
+        else:
+            d[i[0]]=[i[1]]
 
-    dbCon = connect("db/路径距离数据.db")
-    myCursor = dbCon.execute("""SELECT location1,location2,distance FROM LLD""")
+    return d
+
+def get_distance():
+    cur=pycon.cursor()
+    sql="select * from distance"
     dict_distance = {}
-    for i in myCursor:
-        dict_distance[str(change[i[0]]) + "-" + str(change[i[1]])] = i[2]
+    cur.execute(sql)
+
+    for i in cur.fetchall():
+        if i[0] not in dict_distance:
+            dict_distance[i[0]]={i[1]:i[2]}
+        else:dict_distance[i[0]][i[1]]=i[2]
+
     return dict_distance
 
 def calPrice(a):
@@ -89,9 +91,9 @@ def dijkstra(start, end, allLocation, lujing, change, dict_distance):
         if u == end: break
         Key = dict_distance.keys()
         for v in range(n):
-            if (str(u) + "-" + str(v)) in Key:
-                if distance[u] + int(dict_distance[str(u) + "-" + str(v)]) < distance[v]:
-                    distance[v] = distance[u] + int(dict_distance[str(u) + "-" + str(v)])
+            if u in Key and v in dict_distance[u]:
+                if distance[u] + int(dict_distance[u][v]) < distance[v]:
+                    distance[v] = distance[u] +dict_distance[u][v]
                     pre_node[v] = u
 
     if distance[end] < 999999:
