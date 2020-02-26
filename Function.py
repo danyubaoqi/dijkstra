@@ -125,6 +125,7 @@ def isSameStation(a, b, c, line, content):
                     content.append("在" + b + "换乘" + j + "通往" + c)
                     print("在" + b + "换乘" + j + "通往" + c)
 
+
 #直接返回html
 def make_html(lujing, content, line):
     lenl = len(lujing)
